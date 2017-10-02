@@ -18,6 +18,9 @@ public class GeoCalcActivity extends AppCompatActivity {
     TextView outDistance;
     TextView outBearing;
 
+    Float oDist;
+    Float oBear;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +47,10 @@ public class GeoCalcActivity extends AppCompatActivity {
 
         calc.setOnClickListener(v -> {
             String p1lastr = p1la.getText().toString();
-            if (p1lastr.length() == 0) {
+            String p1lostr = p1lo.getText().toString();
+            String p2lastr = p2la.getText().toString();
+            String p2lostr = p2lo.getText().toString();
+            if (p1lastr.length() == 0 || p1lostr.length() == 0 || p2lastr.length() == 0 || p2lostr.length() == 0) {
                 Snackbar.make(p1la, "Enter 2 Lat/Long Points.", Snackbar.LENGTH_LONG).show();
             } else {
                 Location loc1 = new Location("");
@@ -55,8 +61,10 @@ public class GeoCalcActivity extends AppCompatActivity {
                 loc2.setLatitude(Double.parseDouble(p2la.getText().toString()));
                 loc2.setLongitude(Double.parseDouble(p2lo.getText().toString()));
 
-                outDistance.setText(String.format("%.2f",loc1.distanceTo(loc2)/1000) + " kilometers");
-                outBearing.setText(String.format("%.2f",loc1.bearingTo(loc2)) + " degrees");
+                oDist = loc1.distanceTo(loc2)/1000;
+                oBear = loc1.bearingTo(loc2);
+                outDistance.setText(String.format("%.2f",oDist) + " kilometers");
+                outBearing.setText(String.format("%.2f", oBear) + " degrees");
             }
         });
     }
