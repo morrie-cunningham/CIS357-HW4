@@ -1,5 +1,6 @@
 package edu.gvsu.cis.hw4_geocalc;
 
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -10,22 +11,29 @@ import android.widget.TextView;
 
 public class GeoCalcActivity extends AppCompatActivity {
 
+    EditText p1la;
+    EditText p1lo;
+    EditText p2la;
+    EditText p2lo;
+    TextView outDistance;
+    TextView outBearing;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_geo_calc);
 
-        EditText p1la = (EditText) findViewById(R.id.p1lat);
-        EditText p1lo = (EditText) findViewById(R.id.p1long);
-        EditText p2la = (EditText) findViewById(R.id.p2lat);
-        EditText p2lo = (EditText) findViewById(R.id.p2long);
-        TextView outDistance = (TextView) findViewById(R.id.outputDistanceView);
-        TextView outBearing = (TextView) findViewById(R.id.outputBearingView);
+        p1la = (EditText) findViewById(R.id.p1lat);
+        p1lo = (EditText) findViewById(R.id.p1long);
+        p2la = (EditText) findViewById(R.id.p2lat);
+        p2lo = (EditText) findViewById(R.id.p2long);
+        outDistance = (TextView) findViewById(R.id.outputDistanceView);
+        outBearing = (TextView) findViewById(R.id.outputBearingView);
 
         Button calc = (Button) findViewById(R.id.calcButton);
         Button clear = (Button) findViewById(R.id.clearButton);
 
-        clear.setOnClickListener(v1 -> {
+        clear.setOnClickListener(v -> {
             p1la.setText("");
             p1lo.setText("");
             p2la.setText("");
@@ -34,7 +42,7 @@ public class GeoCalcActivity extends AppCompatActivity {
             outBearing.setText("");
         });
 
-        calc.setOnClickListener(v2 -> {
+        calc.setOnClickListener(v -> {
             String p1lastr = p1la.getText().toString();
             if (p1lastr.length() == 0) {
                 Snackbar.make(p1la, "Enter 2 Lat/Long Points.", Snackbar.LENGTH_LONG).show();
@@ -51,5 +59,10 @@ public class GeoCalcActivity extends AppCompatActivity {
                 outBearing.setText(String.format("%.2f",loc1.bearingTo(loc2)) + " degrees");
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }
