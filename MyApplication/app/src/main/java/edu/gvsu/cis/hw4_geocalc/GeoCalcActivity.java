@@ -7,7 +7,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -53,8 +52,6 @@ public class GeoCalcActivity extends AppCompatActivity {
         if(requestCode == SETTINGS_SELECTION && data != null) {
             String distanceUnits = data.getStringExtra("distanceUnits");
             String bearingUnits = data.getStringExtra("bearingUnits");
-            Log.i("results", distanceUnits + " | " + bearingUnits);
-            //Log.i("results", "KM?: " + isKm + " | DEG?: " + isDeg);
 
             if(distanceUnits.equals("Kilometers")) {
                 if(!isKm) {
