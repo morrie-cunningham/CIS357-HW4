@@ -1,15 +1,24 @@
 package edu.gvsu.cis.hw4_geocalc;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 public class GeoCalcActivity extends AppCompatActivity {
+
+    public static final int SETTINGS_SELECTION = 1;
 
     EditText p1la;
     EditText p1lo;
@@ -18,8 +27,64 @@ public class GeoCalcActivity extends AppCompatActivity {
     TextView outDistance;
     TextView outBearing;
 
-    Float oDist;
-    Float oBear;
+    Double oDist;
+    Double oBear;
+    Boolean isKm = true;
+    Boolean isDeg = true;
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.main_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == R.id.settings) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivityForResult(intent, SETTINGS_SELECTION);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == SETTINGS_SELECTION && data != null) {
+            String distanceUnits = data.getStringExtra("distanceUnits");
+            String bearingUnits = data.getStringExtra("bearingUnits");
+            Log.i("results", distanceUnits + " | " + bearingUnits);
+            //Log.i("results", "KM?: " + isKm + " | DEG?: " + isDeg);
+
+            if(distanceUnits.equals("Kilometers")) {
+                if(!isKm) {
+                    oDist = oDist / 0.621371;
+                    outDistance.setText(String.format("%.2f", oDist) + " kilometers");
+                    isKm = true;
+                }
+            } else {
+                if(isKm) {
+                    oDist = oDist * 0.621371;
+                    outDistance.setText(String.format("%.2f", oDist) + " miles");
+                    isKm = false;
+                }
+            }
+
+            if(bearingUnits.equals("Degrees")) {
+                if(!isDeg) {
+                    oBear = oBear / 17.777777777778;
+                    outBearing.setText(String.format("%.2f", oBear) + " degrees");
+                    isDeg = true;
+                }
+            } else {
+                if(isDeg) {
+                    oBear = oBear * 17.777777777778;
+                    outBearing.setText(String.format("%.2f", oBear) + " mils");
+                    isDeg = false;
+                }
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +108,8 @@ public class GeoCalcActivity extends AppCompatActivity {
             p2lo.setText("");
             outDistance.setText("");
             outBearing.setText("");
+
+            dismissKeyboard(this);
         });
 
         calc.setOnClickListener(v -> {
@@ -61,16 +128,34 @@ public class GeoCalcActivity extends AppCompatActivity {
                 loc2.setLatitude(Double.parseDouble(p2la.getText().toString()));
                 loc2.setLongitude(Double.parseDouble(p2lo.getText().toString()));
 
-                oDist = loc1.distanceTo(loc2)/1000;
-                oBear = loc1.bearingTo(loc2);
-                outDistance.setText(String.format("%.2f",oDist) + " kilometers");
-                outBearing.setText(String.format("%.2f", oBear) + " degrees");
+                oDist = (double) loc1.distanceTo(loc2)/1000;
+
+                if(isKm) {
+                    outDistance.setText(String.format("%.2f", oDist) + " kilometers");
+                } else {
+                    oDist = oDist * 0.621371;
+                    outDistance.setText(String.format("%.2f", oDist) + " miles");
+                    isKm = false;
+                }
+
+                oBear = (double) loc1.bearingTo(loc2);
+
+                if(isDeg) {
+                    outBearing.setText(String.format("%.2f", oBear) + " degrees");
+                } else {
+                    oBear = oBear * 17.777777777778;
+                    outBearing.setText(String.format("%.2f", oBear) + " mils");
+                    isDeg = false;
+                }
             }
+            dismissKeyboard(this);
         });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    public void dismissKeyboard(Activity activity) {
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (null != activity.getCurrentFocus())
+            imm.hideSoftInputFromWindow(activity.getCurrentFocus()
+                    .getApplicationWindowToken(), 0);
     }
 }
